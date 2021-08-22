@@ -40,4 +40,10 @@ func init() {
 	if err != nil {
 		log.Fatal("couldn't Read app configuration")
 	}
+	if port := os.Getenv("PORT"); port != "" {
+		Cfg.Server.Port = port
+	}
+	if host := os.Getenv("HOST"); host != "" {
+		Cfg.Server.Host = host
+	}
 }
