@@ -34,7 +34,7 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
-	configPath := getCurrentPath() + "/config.yaml"
+	configPath := "common/config.yaml"
 	log.Debug("Reading config from ", configPath)
 	err := cleanenv.ReadConfig(configPath, &Cfg)
 	if err != nil {
