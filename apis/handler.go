@@ -55,20 +55,23 @@ func GetRecords(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	log.Debug("Entering GetRecords")
 	var req Request
-	_ = json.NewDecoder(request.Body).Decode(&req)
-	if err := validateRequest(&req); err != nil {
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		buildErrorResponse(response, err, http.StatusBadRequest)
+		return
+	}
+	sDate, eDate, err := validateRequest(&req)
+	if err != nil {
 		log.Debug("Validation failed for GetRecords , Error: ", err)
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
 	}
 	log.Debug("Request ", req)
-
 	s := services.NewRecordService(daos.NewRecordDAO())
-	records, err := s.Find(req.StartDate, req.EndDate, req.MinCount, req.MaxCount)
+	records, err := s.Find(sDate, eDate, req.MinCount, req.MaxCount)
 	var res RecordResponse
 	if err != nil {
 		res.Code = -1
-		res.Msg = "Bad Request"
+		res.Msg = "Records not found"
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
 		res.Code = 0
@@ -84,7 +87,10 @@ func InsertPair(response http.ResponseWriter, request *http.Request) {
 	log.Debug("Entering InsertPair ")
 	response.Header().Set("content-type", "application/json")
 	var pair models.Pair
-	_ = json.NewDecoder(request.Body).Decode(&pair)
+	if err := json.NewDecoder(request.Body).Decode(&pair); err != nil {
+		buildErrorResponse(response, err, http.StatusBadRequest)
+		return
+	}
 	if err := validatePair(&pair); err != nil {
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
@@ -93,7 +99,7 @@ func InsertPair(response http.ResponseWriter, request *http.Request) {
 	res, err := s.Insert(pair.Key, pair.Value)
 	if err != nil {
 		log.Debug("InsertPair failed, Error: ", err)
-		buildErrorResponse(response, err, http.StatusBadRequest)
+		buildErrorResponse(response, err, http.StatusForbidden)
 	} else {
 		log.Debug("Exiting InsertPair, Response: ", res)
 		json.NewEncoder(response).Encode(res)
@@ -105,14 +111,13 @@ func GetPair(response http.ResponseWriter, request *http.Request) {
 	log.Debug("Entering GetPair")
 	response.Header().Set("content-type", "application/json")
 	var pair models.Pair
-	validatePair(&pair)
 	pair.Key = request.FormValue("key")
 	log.Debug("Recieved key ", pair.Key)
 	s := services.NewPairService(daos.NewPairDAO())
 	val, ok := s.Get(pair.Key)
 	if !ok {
-		err := errors.New("Key node Found")
-		buildErrorResponse(response, err, http.StatusBadRequest)
+		err := errors.New("Key not Found")
+		buildErrorResponse(response, err, http.StatusNotFound)
 	} else {
 		pair.Value = val
 		log.Debug("Exiting GetPair, Res: ", pair)

@@ -34,12 +34,18 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
-	configPath := "common/config.yaml"
+	var configPath string
+	if os.Getenv("DEV") != "" {
+		configPath = getCurrentPath() + "/config.yaml"
+	} else {
+		configPath = "common/config.yaml"
+	}
 	log.Debug("Reading config from ", configPath)
 	err := cleanenv.ReadConfig(configPath, &Cfg)
 	if err != nil {
 		log.Fatal("couldn't Read app configuration")
 	}
+	// update port if set from env, needed for heroku deployment
 	if port := os.Getenv("PORT"); port != "" {
 		Cfg.Server.Port = port
 	}

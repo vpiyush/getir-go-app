@@ -16,17 +16,24 @@ type cache struct {
 }
 
 // Exports acces to in-memory DB
-var Cache *cache
+//var Cache *cache
+type Cache struct {
+	*cache
+}
+
+func NewMemCache() *Cache {
+	c := &cache{
+		items: make(map[string]string),
+		mu:    sync.RWMutex{},
+	}
+	return &Cache{c}
+}
 
 // init initalizes the in-memory DB
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
-	Cache = &cache{
-		items: make(map[string]string),
-		mu:    sync.RWMutex{},
-	}
 }
 
 //Insert creates a new key value pair in in-memory db
@@ -34,7 +41,7 @@ func (c *cache) Insert(key string, value string) (*models.Pair, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if _, ok := c.items[key]; ok {
-		return nil, errors.New("Key Already Exists")
+		return nil, errors.New("Key already exists")
 	}
 	c.items[key] = value
 	return &models.Pair{
@@ -51,4 +58,13 @@ func (c *cache) Get(key string) (string, bool) {
 		return value, true
 	}
 	return "", false
+}
+
+//Delete fetches the key value pair based on given key
+func (c *cache) Delete(key string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if _, ok := c.items[key]; ok {
+		delete(c.items, key)
+	}
 }

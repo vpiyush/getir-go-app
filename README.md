@@ -6,54 +6,61 @@ This application has Following Endpoints
 ## set up and run
 * git clone https://github.com/vpiyush/getir-go-app.git
 * cd getir-go-app
-* go build
 * go run main.go
 
+The app will start listining to ":9999"
+
 ## run test
-* go test *.go
+* export DEV=1
+* go test ./apis
 
 ### EndPoints
-TODO
+
+* https://salty-eyrie-76135.herokuapp.com/api/v1/pair
+For above endpoint GET and POST methods are supported, examples are given below
+
+* https://salty-eyrie-76135.herokuapp.com/api/v1/records
+For above endpoint only POST methos is supported, example is given below
+
 
 ### 1. In Memory DB endpoints
-###1.1 POST
+### 1.1 POST
 | Parameters | Description |
 | ------ | ----------- |
 | key    | string |
 | value  | string |
-#### Request Payload
-```jsx
-{
-"key": "active-tabs",
-"value": "getir"
-}
-```
-#### Response Payload
-```jsx
-{
-"key": "active-tabs",
-"value": "getir"
-}
-```
 
-###1.2 GET
+#### Request
+```jsx
+ https://salty-eyrie-76135.herokuapp.com/api/v1/pair
+```
 #### Request Payload
+```jsx
+{
+"key": "active-tabs",
+"value": "getir"
+}
+```
+#### Error Responses
+| Status | Response |
+| ------ | ----------- |
+| 403 | `{ "msg": "key already exists"}` |
+| 400 | `{ "msg": "{field} value is invalid"}` |
+
+### 1.2 GET
+#### Request
 | Parameters | Description |
 | ------ | ----------- |
 | key    | string |
 
 ```jsx
-{
-"key": "active-tabs",
-}
+ https://salty-eyrie-76135.herokuapp.com/api/v1/pair?key=active-tabs
 ```
-#### Response Payload
-```jsx
-{
-"key": "active-tabs",
-"value": "getir"
-}
-```
+#### Error Responses
+| Status | Response |
+| ------ | ----------- |
+| 404 | `{ "msg": "key not found"}` |
+| 400 | `{ "msg": "{field} value is invalid"}` |
 
 ### 2. Mongo DB endpoints
 #### Request Payload
@@ -93,5 +100,9 @@ TODO
   ]
 }
 ```
-
-#### Success Response Payload
+#### Error Responses
+| Status | Response |
+| ------ | ----------- |
+| 500 | `{ "msg": "records not found"}` |
+| 400 | `{ "msg": "{field} value is invalid"}` |
+| 400 | `{ "msg": "Bad Request"}` |

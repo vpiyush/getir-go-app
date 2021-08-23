@@ -4,13 +4,9 @@ package daos
 import (
 	"context"
 	log "github.com/sirupsen/logrus"
-	"github.com/vpiyush/getir-go-app/common"
 	"github.com/vpiyush/getir-go-app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"os"
 	"time"
 )
 
@@ -25,36 +21,14 @@ func NewRecordDAO() *RecordDAO {
 	return &RecordDAO{}
 }
 
-// init sets up the mongo database
-func init() {
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.JSONFormatter{})
-	log.Debug("Connecting to mongo..")
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	clientOptions := options.Client().ApplyURI(common.Cfg.Database.Uri)
-	client, _ := mongo.Connect(ctx, clientOptions)
-
-	// check if the connection was successful
-	// Ping the primary
-	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		log.Fatal(err)
-	}
-	collection = client.Database(common.Cfg.Database.Name).Collection(common.Cfg.Database.Collection)
-	log.Debug("Connected to mongo database ", common.Cfg.Database.Name, " and collection ", common.Cfg.Database.Collection)
-
-	// context needs to be canceled to avoid memory leak
-	//TODO:REVIEW
-	//defer cancel()
-}
-
 //Find does a query to mongo database, filters records and returns record Array
-func (r RecordDAO) Find(startDate string, endDate string, minCount int, maxCount int) ([]models.Record, error) {
-	//TODO: review Context
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	sDate, _ := time.Parse(common.DateFromatYYYYMMDD, startDate)
-	eDate, _ := time.Parse(common.DateFromatYYYYMMDD, endDate)
+func (r RecordDAO) Find(sDate time.Time, eDate time.Time, minCount int, maxCount int) ([]models.Record, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// needs to be canceled to avoid memory leak
+	defer cancel()
+	// create mongo pipe lint for filtering
 	pipeline := mongo.Pipeline{
+		// project stage, project only required members
 		{
 			{"$project", bson.D{
 				{"_id", 0},
@@ -63,6 +37,7 @@ func (r RecordDAO) Find(startDate string, endDate string, minCount int, maxCount
 				{"totalCount", bson.D{{"$sum", "$counts"}}},
 			}},
 		},
+		// match stage, filter records based on below matching conditions
 		{
 			{"$match", bson.D{
 				{"totalCount", bson.D{

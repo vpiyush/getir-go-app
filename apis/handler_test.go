@@ -3,7 +3,8 @@ package apis
 import (
 	"bytes"
 	"fmt"
-	memdb "github.com/vpiyush/getir-go-app/inmemdb"
+	"github.com/vpiyush/getir-go-app/daos"
+	"github.com/vpiyush/getir-go-app/services"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -42,15 +43,29 @@ func TestGetRecords_InvalidRequest(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, http.StatusBadRequest)
 	}
 
 	fmt.Println(rr.Body.String())
 }
 
-func TestGetPair_Success(t *testing.T) {
-	memdb.Cache.Insert("active-tabs", "getir")
-	req, err := http.NewRequest("GET", "/pair?key=active-tabs", nil)
+func TestGetPair_KeyNotFound(t *testing.T) {
+	req, err := http.NewRequest("GET", "/pair?key=active", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(HandlePair)
+	handler.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestInsertPair_Success(t *testing.T) {
+	var jsonStr = []byte(`{"key":"active-tabs","value":"getir"}`)
+	req, err := http.NewRequest("POST", "/pair", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,23 +85,25 @@ func TestGetPair_Success(t *testing.T) {
 	}
 }
 
-func TestGetPair_KeyNotFound(t *testing.T) {
-	req, err := http.NewRequest("GET", "/pair?key=active", nil)
+func TestInsertPair_KeyAlreadExists(t *testing.T) {
+	var jsonStr = []byte(`{"key":"active-tabs","value":"getir"}`)
+	req, err := http.NewRequest("POST", "/pair", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(HandlePair)
 	handler.ServeHTTP(rr, req)
-	if status := rr.Code; status != http.StatusBadRequest {
+	if status := rr.Code; status != http.StatusForbidden {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, http.StatusForbidden)
 	}
 }
 
-func TestInsertPair_Success(t *testing.T) {
-	var jsonStr = []byte(`{"key":"active-tabs","value":"getir"}`)
-	req, err := http.NewRequest("POST", "/pair", bytes.NewBuffer(jsonStr))
+func TestGetPair_Success(t *testing.T) {
+	s := services.NewPairService(daos.NewPairDAO())
+	s.Insert("active-tabs", "getir")
+	req, err := http.NewRequest("GET", "/pair?key=active-tabs", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,5 +136,4 @@ func TestInsertPair_InvalidRequest(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
-
 }
