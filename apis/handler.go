@@ -37,7 +37,8 @@ type Request struct {
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.JSONFormatter{})
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{})
 }
 
 // buildErrorResponse builds error based on error message and code
@@ -46,7 +47,7 @@ func buildErrorResponse(response http.ResponseWriter, err error, code int) {
 		ErrorMessage: err.Error(),
 		StatusCode:   code,
 	}
-	response.WriteHeader(http.StatusBadRequest)
+	response.WriteHeader(code)
 	json.NewEncoder(response).Encode(errRsp)
 }
 

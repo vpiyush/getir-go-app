@@ -17,10 +17,10 @@ The app will start listining to ":9999"
 ### EndPoints
 
 * https://salty-eyrie-76135.herokuapp.com/api/v1/pair
-For above endpoint GET and POST methods are supported, examples are given below
+GET and POST methods are supported, examples are given below
 
 * https://salty-eyrie-76135.herokuapp.com/api/v1/records
-For above endpoint only POST methos is supported, example is given below
+Only POST method is supported, example is given below
 
 
 ### 1. In Memory DB endpoints
@@ -44,8 +44,8 @@ For above endpoint only POST methos is supported, example is given below
 #### Error Responses
 | Status | Response |
 | ------ | ----------- |
-| 403 | `{ "msg": "key already exists"}` |
-| 400 | `{ "msg": "{field} value is invalid"}` |
+| 403 | `{ "message": "key already exists"}` |
+| 400 | `{ "message": "{field} value is invalid"}` |
 
 ### 1.2 GET
 #### Request
@@ -59,8 +59,7 @@ For above endpoint only POST methos is supported, example is given below
 #### Error Responses
 | Status | Response |
 | ------ | ----------- |
-| 404 | `{ "msg": "key not found"}` |
-| 400 | `{ "msg": "{field} value is invalid"}` |
+| 404 | `{ "message": "key not found"}` |
 
 ### 2. Mongo DB endpoints
 #### Request Payload
@@ -103,6 +102,9 @@ For above endpoint only POST methos is supported, example is given below
 #### Error Responses
 | Status | Response |
 | ------ | ----------- |
-| 500 | `{ "msg": "records not found"}` |
-| 400 | `{ "msg": "{field} value is invalid"}` |
-| 400 | `{ "msg": "Bad Request"}` |
+| 500 | `{ "message": "records not found"}` |
+| 400 | `{ "message": "{field} value is invalid"}` |
+| 400 | `{ "message": "parsing time {value} as \"2006-01-02\": cannot parse {value} as \"2006\"}` |
+
+#### LICENSE
+* MIT License

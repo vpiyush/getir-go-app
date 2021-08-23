@@ -17,6 +17,7 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
+	log.SetReportCaller(true)
 
 	log.Debug("Connecting to mongo..")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

@@ -26,8 +26,6 @@ func TestGetRecords_Success(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
-
-	fmt.Println(rr.Body.String())
 }
 
 func TestGetRecords_InvalidRequest(t *testing.T) {
@@ -45,8 +43,6 @@ func TestGetRecords_InvalidRequest(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
 	}
-
-	fmt.Println(rr.Body.String())
 }
 
 func TestGetPair_KeyNotFound(t *testing.T) {
@@ -57,9 +53,9 @@ func TestGetPair_KeyNotFound(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(HandlePair)
 	handler.ServeHTTP(rr, req)
-	if status := rr.Code; status != http.StatusBadRequest {
+	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusBadRequest)
+			status, http.StatusNotFound)
 	}
 }
 

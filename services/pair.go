@@ -1,9 +1,7 @@
 package services
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/vpiyush/getir-go-app/models"
-	"os"
 )
 
 type pairDAO interface {
@@ -13,12 +11,6 @@ type pairDAO interface {
 
 type PairService struct {
 	dao pairDAO
-}
-
-func init() {
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.JSONFormatter{})
 }
 
 // NewRecordService creates a new PairService with the given record DAO.

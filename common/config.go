@@ -34,6 +34,7 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
+	log.SetReportCaller(true)
 	var configPath string
 	if os.Getenv("DEV") != "" {
 		configPath = getCurrentPath() + "/config.yaml"

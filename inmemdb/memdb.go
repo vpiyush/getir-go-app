@@ -34,6 +34,7 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
+	log.SetReportCaller(true)
 }
 
 //Insert creates a new key value pair in in-memory db
