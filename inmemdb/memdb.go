@@ -21,6 +21,7 @@ type Cache struct {
 	*cache
 }
 
+// returns a new Cache
 func NewMemCache() *Cache {
 	c := &cache{
 		items: make(map[string]string),
@@ -29,7 +30,7 @@ func NewMemCache() *Cache {
 	return &Cache{c}
 }
 
-// init initalizes the in-memory DB
+// init sets up logging
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
@@ -61,7 +62,7 @@ func (c *cache) Get(key string) (string, bool) {
 	return "", false
 }
 
-//Delete fetches the key value pair based on given key
+//Delete deletes a key-value pair from in-memory DB
 func (c *cache) Delete(key string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

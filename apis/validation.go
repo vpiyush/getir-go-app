@@ -22,7 +22,7 @@ func validatePair(pair *models.Pair) error {
 
 //ValidateRequest validates a record fetch request object,
 //and returns an error object if validation fails
-func validateRequest(req *Request) (time.Time, time.Time, error) {
+func validateRequest(req *RecordRequest) (time.Time, time.Time, error) {
 	validate := validator.New()
 	err := validate.Struct(req)
 	if err != nil {

@@ -27,13 +27,14 @@ type RecordResponse struct {
 
 //Request represnting GetRecords input structure, includes validation
 // and json tags
-type Request struct {
+type RecordRequest struct {
 	StartDate string `validate:"required" json:"startdate"`
 	EndDate   string `validate:"required" json:"enddate"`
 	MinCount  int    `validate:"required" json:"mincount"`
 	MaxCount  int    `validate:"required" json:"maxcount"`
 }
 
+// init sets up the logging framework
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
@@ -55,18 +56,22 @@ func buildErrorResponse(response http.ResponseWriter, err error, code int) {
 func GetRecords(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	log.Debug("Entering GetRecords")
-	var req Request
+	var req RecordRequest
+	// decode request
 	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
 	}
+	// validate request
 	sDate, eDate, err := validateRequest(&req)
 	if err != nil {
 		log.Debug("Validation failed for GetRecords , Error: ", err)
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
 	}
-	log.Debug("Request ", req)
+	log.Debug("Recieved Request: ", req)
+
+	//create new service to retrieve data
 	s := services.NewRecordService(daos.NewRecordDAO())
 	records, err := s.Find(sDate, eDate, req.MinCount, req.MaxCount)
 	var res RecordResponse
@@ -88,10 +93,12 @@ func InsertPair(response http.ResponseWriter, request *http.Request) {
 	log.Debug("Entering InsertPair ")
 	response.Header().Set("content-type", "application/json")
 	var pair models.Pair
+	// decode request
 	if err := json.NewDecoder(request.Body).Decode(&pair); err != nil {
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
 	}
+	// validate request
 	if err := validatePair(&pair); err != nil {
 		buildErrorResponse(response, err, http.StatusBadRequest)
 		return
@@ -113,7 +120,7 @@ func GetPair(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	var pair models.Pair
 	pair.Key = request.FormValue("key")
-	log.Debug("Recieved key ", pair.Key)
+	log.Debug("Recieved key: ", pair.Key)
 	s := services.NewPairService(daos.NewPairDAO())
 	val, ok := s.Get(pair.Key)
 	if !ok {
@@ -134,6 +141,7 @@ func HandlePair(response http.ResponseWriter, request *http.Request) {
 	case "POST":
 		InsertPair(response, request)
 	default:
+		// unknown method
 		log.Debug("Method not handled, Method: ", request.Method)
 		err := errors.New("EndPoint not found")
 		buildErrorResponse(response, err, http.StatusBadRequest)

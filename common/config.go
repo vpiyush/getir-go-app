@@ -10,6 +10,7 @@ import (
 	"runtime"
 )
 
+// Config Configration
 type Config struct {
 	Server struct {
 		Port string `yaml:"port" env:"SERVER_PORT" env-default:"9999"`
@@ -28,6 +29,7 @@ func getCurrentPath() string {
 	return path.Dir(filename)
 }
 
+// Cfg Exported Config access object
 var Cfg Config
 
 func init() {
@@ -36,6 +38,7 @@ func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetReportCaller(true)
 	var configPath string
+	// setup config file path for dev/production environment
 	if os.Getenv("DEV") != "" {
 		configPath = getCurrentPath() + "/config.yaml"
 	} else {
