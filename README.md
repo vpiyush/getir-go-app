@@ -3,19 +3,18 @@ This application has Following Endpoints
 1. records (POST) Filters and fetches data from mongoDB
 2. pair (GET/POST) Creates and fetches data from an in memory DB
 
-## set up and run
+## Set up and run
 * git clone https://github.com/vpiyush/getir-go-app.git
 * cd getir-go-app
 * go run main.go
 
 The app will start listining to ":9999"
 
-## run test
+## Run test
 * export DEV=1
 * go test ./apis
 
-### EndPoints
-
+## EndPoints
 * https://salty-eyrie-76135.herokuapp.com/api/v1/pair
 GET and POST methods are supported, examples are given below
 
@@ -24,31 +23,31 @@ Only POST method is supported, example is given below
 
 
 ### 1. In Memory DB endpoints
-### 1.1 POST
+#### 1.1 POST
 | Parameters | Description |
 | ------ | ----------- |
 | key    | string |
 | value  | string |
 
-#### Request
+##### Request
 ```jsx
  https://salty-eyrie-76135.herokuapp.com/api/v1/pair
 ```
-#### Request Payload
+##### Request Payload
 ```jsx
 {
 "key": "active-tabs",
 "value": "getir"
 }
 ```
-#### Error Responses
+##### Error Responses
 | Status | Response |
 | ------ | ----------- |
 | 403 | `{ "message": "key already exists"}` |
 | 400 | `{ "message": "{field} value is invalid"}` |
 
-### 1.2 GET
-#### Request
+#### 1.2 GET
+##### Request
 | Parameters | Description |
 | ------ | ----------- |
 | key    | string |
@@ -56,13 +55,14 @@ Only POST method is supported, example is given below
 ```jsx
  https://salty-eyrie-76135.herokuapp.com/api/v1/pair?key=active-tabs
 ```
-#### Error Responses
+##### Error Responses
 | Status | Response |
 | ------ | ----------- |
 | 404 | `{ "message": "key not found"}` |
 
 ### 2. Mongo DB endpoints
-#### Request Payload
+#### 2.1 POST
+##### Request Payload
 
 | Parameters | Description |
 | ------ | ----------- |
@@ -80,7 +80,7 @@ Only POST method is supported, example is given below
 }
 ```
 
-#### Response Payload
+##### Response Payload
 ```jsx
 {
   "code":0,
@@ -99,12 +99,12 @@ Only POST method is supported, example is given below
   ]
 }
 ```
-#### Error Responses
+##### Error Responses
 | Status | Response |
 | ------ | ----------- |
 | 500 | `{ "message": "records not found"}` |
 | 400 | `{ "message": "{field} value is invalid"}` |
 | 400 | `{ "message": "parsing time {value} as \"2006-01-02\": cannot parse {value} as \"2006\"}` |
 
-#### LICENSE
+## LICENSE
 * MIT License
