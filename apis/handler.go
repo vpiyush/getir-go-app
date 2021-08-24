@@ -1,4 +1,4 @@
-// Packave api provides functions which are used to server the http Endpoints
+// Packave api provides functions which are used to serve the http Endpoints
 package apis
 
 import (
@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-// ErrorRespnse
+// ErrorResponse to be sent back for any errors in the system
 type ErrorResponse struct {
 	StatusCode   int    `json:"status"`
 	ErrorMessage string `json:"message"`
@@ -25,7 +25,7 @@ type RecordResponse struct {
 	Records []models.Record `json:"records"`
 }
 
-//Request represnting GetRecords input structure, includes validation
+//Request representing GetRecords input structure, includes validation
 // and json tags
 type RecordRequest struct {
 	StartDate string `validate:"required" json:"startdate"`
